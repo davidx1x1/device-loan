@@ -243,10 +243,6 @@ Users receive emails for:
 4. Write tests
 5. Submit a pull request
 
-## License
-
-This project is licensed for educational purposes.
-
 ## Support
 
 For issues and questions, please contact Campus IT Support or create an issue in the repository.
