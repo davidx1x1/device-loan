@@ -1,17 +1,9 @@
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import { createContextLogger } from '../logging/logger';
 import { DeviceModel, User } from '../types/database';
 
-// Email transporter configuration
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: parseInt(process.env.SMTP_PORT || '587', 10),
-  secure: false, // true for 465, false for other ports
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASSWORD,
-  },
-});
+// Resend client configuration
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const fromAddress = process.env.SMTP_FROM || 'Device Loans <noreply@deviceloans.edu>';
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
@@ -109,7 +101,7 @@ export async function sendReservationConfirmation(
 </html>
     `;
 
-    await transporter.sendMail({
+    await resend.emails.send({
       from: fromAddress,
       to: data.user.email,
       subject: `Device Reservation Confirmed - ${data.deviceModel.brand} ${data.deviceModel.model}`,
@@ -186,7 +178,7 @@ export async function sendCollectionConfirmation(
 </html>
     `;
 
-    await transporter.sendMail({
+    await resend.emails.send({
       from: fromAddress,
       to: data.user.email,
       subject: `Device Collected - Return by ${new Date(data.dueDate).toLocaleDateString()}`,
@@ -251,7 +243,7 @@ export async function sendReturnConfirmation(
 </html>
     `;
 
-    await transporter.sendMail({
+    await resend.emails.send({
       from: fromAddress,
       to: data.user.email,
       subject: `Device Return Confirmed - ${data.deviceModel.brand} ${data.deviceModel.model}`,
@@ -323,7 +315,7 @@ export async function sendDeviceAvailableNotification(
 </html>
     `;
 
-    await transporter.sendMail({
+    await resend.emails.send({
       from: fromAddress,
       to: data.user.email,
       subject: `Device Available: ${data.deviceModel.brand} ${data.deviceModel.model}`,
@@ -347,8 +339,13 @@ export async function verifyEmailConfig(): Promise<boolean> {
   const logger = createContextLogger({});
 
   try {
-    await transporter.verify();
-    logger.info('Email service configured successfully');
+    // Check if API key is configured
+    if (!process.env.RESEND_API_KEY) {
+      logger.warn('RESEND_API_KEY not configured');
+      return false;
+    }
+
+    logger.info('Email service configured with Resend');
     return true;
   } catch (error) {
     logger.error({ error }, 'Email service configuration failed');
