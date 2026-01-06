@@ -3,7 +3,7 @@ import { supabaseAdmin } from '@/lib/db/client';
 import { createContextLogger, getRequestContext } from '@/lib/logging/logger';
 import { requireStaff } from '@/lib/middleware/rbac';
 import { ApiResponse, MarkCollectedRequest, LoanActionResponse } from '@/lib/types/api';
-import { sendCollectionConfirmation } from '@/lib/email/resend-service';
+import { sendCollectionConfirmation } from '@/lib/email/service';
 
 // POST /api/staff/collect - Mark a device as collected
 // Staff only

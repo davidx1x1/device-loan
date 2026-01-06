@@ -3,7 +3,7 @@ import { supabaseAdmin } from '@/lib/db/client';
 import { createContextLogger, getRequestContext } from '@/lib/logging/logger';
 import { requireStaff } from '@/lib/middleware/rbac';
 import { ApiResponse, MarkReturnedRequest, LoanActionResponse } from '@/lib/types/api';
-import { sendReturnConfirmation, sendDeviceAvailableNotification } from '@/lib/email/resend-service';
+import { sendReturnConfirmation, sendDeviceAvailableNotification } from '@/lib/email/service';
 
 // POST /api/staff/return - Mark a device as returned
 // Staff only

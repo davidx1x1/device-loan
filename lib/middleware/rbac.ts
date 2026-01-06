@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/auth/supabase-server';
 import { UserRole } from '../types/database';
 import { createContextLogger } from '../logging/logger';
+import type { Database } from '@/lib/types/supabase';
 
 export interface AuthenticatedRequest extends NextRequest {
   user?: {
@@ -16,7 +17,7 @@ export interface AuthenticatedRequest extends NextRequest {
 // Middleware to check authentication
 export async function requireAuth(
   req: NextRequest
-): Promise<{ user: AuthenticatedRequest['user']; correlation_id: string } | NextResponse> {
+): Promise<{ user: NonNullable<AuthenticatedRequest['user']>; correlation_id: string } | NextResponse> {
   const logger = createContextLogger({
     correlation_id: req.headers.get('x-correlation-id') || undefined,
   });
@@ -65,12 +66,15 @@ export async function requireAuth(
       );
     }
 
+    // Type assertion to help TypeScript understand profile is defined
+    const userProfile: Database['public']['Tables']['profiles']['Row'] = profile;
+
     return {
       user: {
-        id: profile.id,
-        email: profile.email,
-        name: profile.name,
-        role: profile.role as UserRole,
+        id: userProfile.id,
+        email: userProfile.email,
+        name: userProfile.name,
+        role: userProfile.role as UserRole,
       },
       correlation_id: logger.bindings().correlation_id as string,
     };
@@ -93,7 +97,7 @@ export async function requireAuth(
 export async function requireRole(
   req: NextRequest,
   allowedRoles: UserRole[]
-): Promise<{ user: AuthenticatedRequest['user']; correlation_id: string } | NextResponse> {
+): Promise<{ user: NonNullable<AuthenticatedRequest['user']>; correlation_id: string } | NextResponse> {
   const authResult = await requireAuth(req);
 
   if (authResult instanceof NextResponse) {
@@ -127,6 +131,6 @@ export async function requireRole(
 // Middleware to check if user is staff
 export async function requireStaff(
   req: NextRequest
-): Promise<{ user: AuthenticatedRequest['user']; correlation_id: string } | NextResponse> {
+): Promise<{ user: NonNullable<AuthenticatedRequest['user']>; correlation_id: string } | NextResponse> {
   return requireRole(req, ['staff']);
 }
