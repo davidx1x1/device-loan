@@ -250,3 +250,4 @@ For issues and questions, please contact Campus IT Support or create an issue in
 ## Acknowledgments
 
 Built as a student project for campus device loan management.
+The End.
