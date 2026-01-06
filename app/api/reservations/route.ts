@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
   }
 
   const { user, correlation_id } = authResult;
-  logger.info({ user_id: user.id, auth0_id: user.auth0_id }, 'User authenticated');
+  logger.info({ user_id: user.id, email: user.email }, 'User authenticated');
 
   try {
     const body: CreateReservationRequest = await req.json();
