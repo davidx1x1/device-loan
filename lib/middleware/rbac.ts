@@ -16,7 +16,7 @@ export interface AuthenticatedRequest extends NextRequest {
 // Middleware to check authentication
 export async function requireAuth(
   req: NextRequest
-): Promise<{ user: AuthenticatedRequest['user']; correlation_id: string } | NextResponse> {
+): Promise<{ user: NonNullable<AuthenticatedRequest['user']>; correlation_id: string } | NextResponse> {
   const logger = createContextLogger({
     correlation_id: req.headers.get('x-correlation-id') || undefined,
   });
@@ -93,7 +93,7 @@ export async function requireAuth(
 export async function requireRole(
   req: NextRequest,
   allowedRoles: UserRole[]
-): Promise<{ user: AuthenticatedRequest['user']; correlation_id: string } | NextResponse> {
+): Promise<{ user: NonNullable<AuthenticatedRequest['user']>; correlation_id: string } | NextResponse> {
   const authResult = await requireAuth(req);
 
   if (authResult instanceof NextResponse) {
@@ -127,6 +127,6 @@ export async function requireRole(
 // Middleware to check if user is staff
 export async function requireStaff(
   req: NextRequest
-): Promise<{ user: AuthenticatedRequest['user']; correlation_id: string } | NextResponse> {
+): Promise<{ user: NonNullable<AuthenticatedRequest['user']>; correlation_id: string } | NextResponse> {
   return requireRole(req, ['staff']);
 }
